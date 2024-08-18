@@ -50,7 +50,7 @@ function App() {
   };
 
   return (
-    <GoogleOAuthProvider clientId={process.env.GOOGLE_AUTH.CLIENT_ID}>
+    <GoogleOAuthProvider clientId={process.env.GOOGLE_AUTH_CLIENT_ID}>
       <Header
         user={user}
         onLoginSuccess={handleLoginSuccess}

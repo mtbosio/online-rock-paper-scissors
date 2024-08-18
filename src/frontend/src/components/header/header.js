@@ -6,7 +6,7 @@ function Header({ user, onLoginSuccess, onLogout }) {
     <div className={styles.container}>
       <nav className={styles.nav}>
         <div className={styles.left}>
-          <Logo />
+          <Logo width={"100px"} />
           <div>Rock, Paper, Scissors!</div>
         </div>
         <div className={styles.right}>
