@@ -1,30 +1,57 @@
 const express = require("express");
-const http = require("http");
-const socketIo = require("socket.io");
-const path = require("path");
+const { OAuth2Client } = require("google-auth-library");
+const session = require("express-session");
+const cors = require("cors");
 
 const app = express();
-const server = http.createServer(app);
-const io = socketIo(server);
+const client = new OAuth2Client(process.env.GOOGLE_AUTH_CLIENT_ID);
 
-// Serve the React app
-app.use(express.static(path.join(__dirname, "../front/build")));
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL, // your frontend origin
+    credentials: true,
+  })
+);
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../front/build", "index.html"));
+app.use(express.json());
+
+app.use(
+  session({
+    secret: "your_secret_key",
+    resave: false,
+    saveUninitialized: true,
+  })
+);
+
+app.post("/auth/google", async (req, res) => {
+  const { token } = req.body;
+
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_AUTH_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+
+    req.session.user = {
+      id: payload.sub,
+      email: payload.email,
+      name: payload.name,
+    };
+
+    res.status(200).send({ success: true, user: req.session.user });
+  } catch (error) {
+    console.error(error);
+    res.status(401).send({ success: false, message: "Authentication failed" });
+  }
 });
 
-io.on("connection", (socket) => {
-  console.log("A user connected");
-
-  socket.on("playerMove", (move) => {
-    socket.broadcast.emit("opponentMove", move);
-  });
-
-  socket.on("disconnect", () => {
-    console.log("A user disconnected");
-  });
+app.get("/auth/logout", (req, res) => {
+  req.session.destroy();
+  res.status(200).send({ success: true });
 });
 
 const PORT = process.env.PORT || 5001;
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
