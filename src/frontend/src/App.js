@@ -1,16 +1,14 @@
 import "./App.css";
-import io from "socket.io-client";
-import { useState, useEffect } from "react";
+//import io from "socket.io-client";
+import { useState } from "react";
 import Header from "./components/header/header";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-const socket = io("http://localhost:5001");
+//const socket = io("http://localhost:5001");
 
 function App() {
   const [user, setUser] = useState(() => {
     return JSON.parse(localStorage.getItem("user"));
   });
-  const [playerMove, setPlayerMove] = useState(null);
-  const [opponentMove, setOpponentMove] = useState(null);
 
   const handleLogout = () => {
     fetch(`${process.env.BACKEND_URL}/auth/logout`)
@@ -36,6 +34,10 @@ function App() {
       })
       .catch((error) => console.log("Login Error: ", error));
   };
+  /*const [playerMove, setPlayerMove] = useState(null);
+  const [opponentMove, setOpponentMove] = useState(null);
+
+  
 
   useEffect(() => {
     socket.on("opponentMove", (move) => {
@@ -48,7 +50,7 @@ function App() {
     setPlayerMove(move);
     socket.emit("playerMove", move);
   };
-
+  */
   return (
     <GoogleOAuthProvider clientId={process.env.GOOGLE_AUTH_CLIENT_ID}>
       <Header
