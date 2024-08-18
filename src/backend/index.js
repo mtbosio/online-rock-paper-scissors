@@ -17,7 +17,7 @@ app.use(express.json());
 
 app.use(
   session({
-    secret: "your_secret_key",
+    secret: process.env.GOOGLE_AUTH_CLIENT_SECRET,
     resave: false,
     saveUninitialized: true,
   })

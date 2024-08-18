@@ -1,7 +1,6 @@
-import { GoogleLogin } from "@react-oauth/google";
 import styles from "./header.module.css";
 import { ReactComponent as Logo } from "../../assets/svgs/stone-scroll-sheers-logo.svg";
-function Header({ user, onLoginSuccess, onLogout }) {
+function Header({ user, login, logout }) {
   return (
     <div className={styles.container}>
       <nav className={styles.nav}>
@@ -11,19 +10,21 @@ function Header({ user, onLoginSuccess, onLogout }) {
         </div>
         <div className={styles.right}>
           <div>Play Game</div>
-          <div>
-            {user ? (
-              <>
-                <div>{user.name}</div>
-                <button onClick={onLogout}>Logout</button>
-              </>
-            ) : (
-              <GoogleLogin
-                onSuccess={onLoginSuccess}
-                onError={() => console.log("Login Failed")}
-              />
-            )}
-          </div>
+
+          {user ? (
+            <div className={styles.profile}>
+              <div>{user.name}</div>
+              <button onClick={logout}>Logout</button>
+            </div>
+          ) : (
+            <button
+              className={styles.loginButton}
+              onClick={login}
+              onError={() => console.log("Login Failed")}
+            >
+              Log in With Google
+            </button>
+          )}
         </div>
       </nav>
     </div>

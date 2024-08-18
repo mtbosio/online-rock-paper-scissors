@@ -1,39 +1,46 @@
 import "./App.css";
 //import io from "socket.io-client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "./components/header/header";
-import { GoogleOAuthProvider } from "@react-oauth/google";
+import { googleLogout, useGoogleLogin } from "@react-oauth/google";
+import axios from "axios";
 //const socket = io("http://localhost:5001");
 
 function App() {
-  const [user, setUser] = useState(() => {
-    return JSON.parse(localStorage.getItem("user"));
+  const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState([]);
+
+  const login = useGoogleLogin({
+    onSuccess: (codeResponse) => setUser(codeResponse),
+    onError: (error) => console.log("Login Failed:", error),
   });
 
-  const handleLogout = () => {
-    fetch(`${process.env.BACKEND_URL}/auth/logout`)
-      .then(() => {
-        localStorage.removeItem("user");
-        setUser(null);
-      })
-      .catch((error) => console.error("Logout Error:", error));
+  useEffect(() => {
+    if (user) {
+      axios
+        .get(
+          `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`,
+          {
+            headers: {
+              Authorization: `Bearer ${user.access_token}`,
+              Accept: "application/json",
+            },
+          }
+        )
+        .then((res) => {
+          setProfile(res.data);
+          console.log(res.data);
+        })
+        .catch((err) => console.log(err));
+    }
+  }, [user]);
+
+  // log out function to log the user out of google and set the profile array to null
+  const logOut = () => {
+    googleLogout();
+    setProfile(null);
   };
 
-  const handleLoginSuccess = (response) => {
-    fetch(`${process.env.BACKEND_URL}/auth/google`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token: response.credential }),
-    })
-      .then((res) => {
-        res.json();
-      })
-      .then((data) => {
-        localStorage.setItem("user", JSON.stringify(data.user));
-        setUser(data.user);
-      })
-      .catch((error) => console.log("Login Error: ", error));
-  };
   /*const [playerMove, setPlayerMove] = useState(null);
   const [opponentMove, setOpponentMove] = useState(null);
 
@@ -52,22 +59,9 @@ function App() {
   };
   */
   return (
-    <GoogleOAuthProvider clientId={process.env.GOOGLE_AUTH_CLIENT_ID}>
-      <Header
-        user={user}
-        onLoginSuccess={handleLoginSuccess}
-        onLogout={handleLogout}
-      />
-      {/*<div>
-        <button onClick={() => handleMove("rock")}>Rock</button>
-        <button onClick={() => handleMove("paper")}>Paper</button>
-        <button onClick={() => handleMove("scissors")}>Scissors</button>
-        <div>
-          <p>Your move: {playerMove}</p>
-          <p>Opponent's move: {opponentMove}</p>
-        </div>
-      </div>*/}
-    </GoogleOAuthProvider>
+    <>
+      <Header user={profile} login={login} logout={logOut} />
+    </>
   );
 }
 

@@ -20,5 +20,10 @@
     width: 50%;
     flex-direction: row;
     justify-content: space-around;
+
+    .profile {
+      display: flex;
+      flex-direction: row;
+    }
   }
 }
