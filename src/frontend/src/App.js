@@ -17,6 +17,18 @@ socket.on("disconnect", () => {
 });
 
 function App() {
+  // logic flow:
+  // 1. user connects to page but not signed in
+  //    -- Sign in to get started!
+  // 2. User signs in
+  //    -- Create or join a match to play with friends!
+  // 3a. User creates a match
+  // 3b. User joins a match
+  //    -- options for moves are shown
+  // 4. User selects a move
+  //    -- display waiting modal
+  // 5. Opponent selects a move and the game ends.
+  //    -- display result
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [matchStarted, setMatchStarted] = useState(null);
@@ -96,19 +108,58 @@ function App() {
         createMatch={createMatch}
         joinMatch={joinMatch}
       />
-      {matchId ? <h2 className="center">Match Id: {matchId}</h2> : <></>}
-      {matchStarted && !playerMove ? (
-        <div className="center">
-          <button onClick={() => handleMove("Stone")}>Stone</button>
-          <button onClick={() => handleMove("Scroll")}>Scroll</button>
-          <button onClick={() => handleMove("Shears")}>Shears</button>
-        </div>
+      {/* 2. User signs in */}
+      {user ? (
+        <>
+          {result ? (
+            <h2 className="center">{result.message}</h2>
+          ) : (
+            <>
+              {matchStarted && !playerMove ? (
+                <div className="center">
+                  <button onClick={() => handleMove("Stone")}>Stone</button>
+                  <button onClick={() => handleMove("Scroll")}>Scroll</button>
+                  <button onClick={() => handleMove("Shears")}>Shears</button>
+                </div>
+              ) : (
+                <>
+                  {matchId ? (
+                    <></>
+                  ) : (
+                    <div className="center">
+                      {/* 3a/3b. User hosts / joins a match */}
+                      <h2>
+                        Click <b style={{ margin: "0 5px" }}>CREATE MATCH</b> to
+                        receive a code to share with your friend.
+                      </h2>
+                      <h2>
+                        <b>OR</b>
+                      </h2>
+                      <h2>
+                        Click <b style={{ margin: "0 5px" }}>JOIN MATCH</b> to
+                        enter a code to join.
+                      </h2>
+                    </div>
+                  )}
+                </>
+              )}
+              {matchId && !matchStarted ? (
+                <div className="center">
+                  <h2>Match Id: {matchId}</h2>
+                  <h2>Share this code with your friend to start the match!</h2>
+                </div>
+              ) : (
+                <></>
+              )}
+            </>
+          )}
+        </>
       ) : (
-        <h2 className="center">
-          Host a game and share the code with your friend to start!
-        </h2>
+        <>
+          {/* 1. User connects but is not signed in*/}
+          <h2 className="center">Sign in to get started!</h2>
+        </>
       )}
-      {result ? <h2 className="center">{result.message}</h2> : <></>}
     </>
   );
 }
