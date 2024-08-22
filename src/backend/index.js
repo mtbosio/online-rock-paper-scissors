@@ -97,10 +97,10 @@ io.on("connection", (socket) => {
         io.to(player1).emit("gameResult", result);
         io.to(player2).emit("gameResult", {
           message:
-            result.message === "You win!"
-              ? "You lose!"
-              : result.message === "You lose!"
-              ? "You win!"
+            result.message === "You have proved victorius... well done."
+              ? "You have lost... a great disservice."
+              : result.message === "You have lost... a great disservice."
+              ? "You have proved victorius... well done."
               : result.message,
           opponentMove: move1,
         });

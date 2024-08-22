@@ -100,13 +100,14 @@ function App() {
   };
 
   return (
-    <>
+    <div className="container">
       <Header
         user={profile}
         login={login}
         logout={logOut}
         createMatch={createMatch}
         joinMatch={joinMatch}
+        matchStarted={matchStarted}
       />
       {/* 2. User signs in */}
       {user ? (
@@ -115,12 +116,38 @@ function App() {
             <h2 className="center">{result.message}</h2>
           ) : (
             <>
-              {matchStarted && !playerMove ? (
-                <div className="center">
-                  <button onClick={() => handleMove("Stone")}>Stone</button>
-                  <button onClick={() => handleMove("Scroll")}>Scroll</button>
-                  <button onClick={() => handleMove("Shears")}>Shears</button>
-                </div>
+              {matchStarted ? (
+                <>
+                  {playerMove ? (
+                    <div className="center">
+                      <h2>Waiting for opponent...</h2>
+                    </div>
+                  ) : (
+                    <div className="center">
+                      <h2>Which do you choose?</h2>
+                      <div className="options">
+                        <button onClick={() => handleMove("Stone")}>
+                          <img
+                            src={require("./assets/images/stone.png")}
+                            alt="Stone"
+                          />
+                        </button>
+                        <button onClick={() => handleMove("Scroll")}>
+                          <img
+                            src={require("./assets/images/scroll.png")}
+                            alt="Scroll"
+                          />
+                        </button>
+                        <button onClick={() => handleMove("Shears")}>
+                          <img
+                            src={require("./assets/images/shears.png")}
+                            alt="Shears"
+                          />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </>
               ) : (
                 <>
                   {matchId ? (
@@ -160,7 +187,7 @@ function App() {
           <h2 className="center">Sign in to get started!</h2>
         </>
       )}
-    </>
+    </div>
   );
 }
 

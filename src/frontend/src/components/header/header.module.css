@@ -1,4 +1,6 @@
 .nav {
+  background-color: #31835f;
+  border-bottom: 3px solid black;
   display: flex;
   width: 100%;
   justify-content: space-between;
@@ -11,7 +13,8 @@
     height: 50%;
     justify-content: flex-start;
     align-items: center;
-    * {
+    h1 {
+      color: #fff;
       margin-left: 2%;
     }
   }
@@ -24,26 +27,11 @@
     align-items: center;
 
     button {
+      color: #fff;
       margin-right: 2%;
-      height: 100%;
-      width: 100%;
     }
-    .userInfo {
-      width: 100%;
-      margin-right: 2%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      .profilePicture {
-        width: auto;
-        height: 50%;
-        border-radius: 50%;
-      }
-      span {
-        margin-right: 5%;
-        text-align: center;
-        height: auto;
-      }
+    button:hover {
+      color: black;
     }
   }
 }
