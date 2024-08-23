@@ -113,7 +113,131 @@ function App() {
       {user ? (
         <>
           {result ? (
-            <h2 className="center">{result.message}</h2>
+            <div className="resultContainer">
+              <h2>{result.message}</h2>
+              <div className="pictureContainer">
+                <div className="center">
+                  <h2
+                    style={{
+                      height: "25%",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    You chose {playerMove}.
+                  </h2>
+
+                  {playerMove === "Stone" ? (
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        height: "75%",
+                      }}
+                    >
+                      <img
+                        src={require("./assets/images/stone.png")}
+                        alt="Stone"
+                      />
+                    </div>
+                  ) : (
+                    <></>
+                  )}
+                  {playerMove === "Scroll" ? (
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        height: "75%",
+                      }}
+                    >
+                      <img
+                        src={require("./assets/images/scroll.png")}
+                        alt="Scroll"
+                      />
+                    </div>
+                  ) : (
+                    <></>
+                  )}
+                  {playerMove === "Shears" ? (
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        height: "75%",
+                      }}
+                    >
+                      <img
+                        src={require("./assets/images/shears.png")}
+                        alt="Shears"
+                      />
+                    </div>
+                  ) : (
+                    <></>
+                  )}
+                </div>
+                <div className="center">
+                  <h2
+                    style={{
+                      height: "25%",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    Your opponent chose {result.opponentMove}.
+                  </h2>
+
+                  {result.opponentMove === "Stone" ? (
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        height: "75%",
+                      }}
+                    >
+                      <img
+                        src={require("./assets/images/stone.png")}
+                        alt="Stone"
+                      />
+                    </div>
+                  ) : (
+                    <></>
+                  )}
+                  {result.opponentMove === "Scroll" ? (
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        height: "75%",
+                      }}
+                    >
+                      <img
+                        src={require("./assets/images/scroll.png")}
+                        alt="Scroll"
+                      />
+                    </div>
+                  ) : (
+                    <></>
+                  )}
+                  {result.opponentMove === "Shears" ? (
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        height: "75%",
+                      }}
+                    >
+                      <img
+                        src={require("./assets/images/shears.png")}
+                        alt="Shears"
+                      />
+                    </div>
+                  ) : (
+                    <></>
+                  )}
+                </div>
+              </div>
+            </div>
           ) : (
             <>
               {matchStarted ? (
