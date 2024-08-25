@@ -5,7 +5,7 @@
   width: 100%;
   justify-content: space-between;
   flex-direction: row;
-  height: 130px;
+  height: 10vh;
   align-items: center;
   .left {
     display: flex;

@@ -99,8 +99,15 @@ function App() {
     socket.emit("playerMove", move);
   };
 
+  const reset = () => {
+    setMatchID(null);
+    setPlayerMove(null);
+    setMatchStarted(null);
+    setResult(null);
+  };
+
   return (
-    <div className="container">
+    <>
       <Header
         user={profile}
         login={login}
@@ -109,209 +116,142 @@ function App() {
         joinMatch={joinMatch}
         matchStarted={matchStarted}
       />
-      {/* 2. User signs in */}
-      {user ? (
-        <>
-          {result ? (
-            <div className="resultContainer">
-              <h2>{result.message}</h2>
-              <div className="pictureContainer">
-                <div className="center">
-                  <h2
-                    style={{
-                      height: "25%",
-                      display: "flex",
-                      alignItems: "center",
-                    }}
-                  >
-                    You chose {playerMove}.
-                  </h2>
-
-                  {playerMove === "Stone" ? (
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        height: "75%",
-                      }}
-                    >
-                      <img
-                        src={require("./assets/images/stone.png")}
-                        alt="Stone"
-                      />
-                    </div>
-                  ) : (
-                    <></>
-                  )}
-                  {playerMove === "Scroll" ? (
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        height: "75%",
-                      }}
-                    >
-                      <img
-                        src={require("./assets/images/scroll.png")}
-                        alt="Scroll"
-                      />
-                    </div>
-                  ) : (
-                    <></>
-                  )}
-                  {playerMove === "Shears" ? (
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        height: "75%",
-                      }}
-                    >
-                      <img
-                        src={require("./assets/images/shears.png")}
-                        alt="Shears"
-                      />
-                    </div>
-                  ) : (
-                    <></>
-                  )}
-                </div>
-                <div className="center">
-                  <h2
-                    style={{
-                      height: "25%",
-                      display: "flex",
-                      alignItems: "center",
-                    }}
-                  >
-                    Your opponent chose {result.opponentMove}.
-                  </h2>
-
-                  {result.opponentMove === "Stone" ? (
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        height: "75%",
-                      }}
-                    >
-                      <img
-                        src={require("./assets/images/stone.png")}
-                        alt="Stone"
-                      />
-                    </div>
-                  ) : (
-                    <></>
-                  )}
-                  {result.opponentMove === "Scroll" ? (
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        height: "75%",
-                      }}
-                    >
-                      <img
-                        src={require("./assets/images/scroll.png")}
-                        alt="Scroll"
-                      />
-                    </div>
-                  ) : (
-                    <></>
-                  )}
-                  {result.opponentMove === "Shears" ? (
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        height: "75%",
-                      }}
-                    >
-                      <img
-                        src={require("./assets/images/shears.png")}
-                        alt="Shears"
-                      />
-                    </div>
-                  ) : (
-                    <></>
-                  )}
-                </div>
+      <main>
+        {/* 1. User connects but is not signed in*/}
+        {!user && <h2>Sign in to get started!</h2>}
+        {/* 2. User signs in */}
+        {user && (
+          <>
+            {/* Match has not been created yet */}
+            {!matchStarted && !matchId && !result && (
+              <div className="center">
+                {/* 3a/3b. User hosts / joins a match */}
+                <h2>
+                  Click <b style={{ margin: "0 5px" }}>CREATE MATCH</b> to
+                  receive a code to share with your friend.
+                </h2>
+                <h2>
+                  <b>OR</b>
+                </h2>
+                <h2>
+                  Click <b style={{ margin: "0 5px" }}>JOIN MATCH</b> to enter a
+                  code to join.
+                </h2>
               </div>
-            </div>
-          ) : (
-            <>
-              {matchStarted ? (
-                <>
-                  {playerMove ? (
-                    <div className="center">
-                      <h2>Waiting for opponent...</h2>
+            )}
+            {/* Match has been created but not joined */}
+            {matchId && !matchStarted && !result && (
+              <div className="center">
+                <h2>Match Id: {matchId}</h2>
+                <h2>Share this code with your friend to start the match!</h2>
+              </div>
+            )}
+            {/* Match has started */}
+            {matchStarted && (
+              <>
+                {/* Player has made a move */}
+                {playerMove && (
+                  <div className="center">
+                    <h2>Waiting for opponent...</h2>
+                  </div>
+                )}
+                {/* Player has not made a move */}
+                {!playerMove && (
+                  <div className="center">
+                    <h2>Which do you choose?</h2>
+                    <div className="options">
+                      <button onClick={() => handleMove("Stone")}>
+                        <img
+                          src={require("./assets/images/stone.png")}
+                          alt="Stone"
+                        />
+                      </button>
+                      <button onClick={() => handleMove("Scroll")}>
+                        <img
+                          src={require("./assets/images/scroll.png")}
+                          alt="Scroll"
+                        />
+                      </button>
+                      <button onClick={() => handleMove("Shears")}>
+                        <img
+                          src={require("./assets/images/shears.png")}
+                          alt="Shears"
+                        />
+                      </button>
                     </div>
-                  ) : (
-                    <div className="center">
-                      <h2>Which do you choose?</h2>
-                      <div className="options">
-                        <button onClick={() => handleMove("Stone")}>
-                          <img
-                            src={require("./assets/images/stone.png")}
-                            alt="Stone"
-                          />
-                        </button>
-                        <button onClick={() => handleMove("Scroll")}>
-                          <img
-                            src={require("./assets/images/scroll.png")}
-                            alt="Scroll"
-                          />
-                        </button>
-                        <button onClick={() => handleMove("Shears")}>
-                          <img
-                            src={require("./assets/images/shears.png")}
-                            alt="Shears"
-                          />
-                        </button>
+                  </div>
+                )}
+              </>
+            )}
+            {/* Match is over and result is displayed */}
+            {result && (
+              <div className="resultContainer">
+                <h2>{result.message}</h2>
+                <div className="movePictureContainer">
+                  <div className="movePicture">
+                    <h2>You chose {playerMove}.</h2>
+                    {playerMove === "Stone" && (
+                      <div>
+                        <img
+                          src={require("./assets/images/stone.png")}
+                          alt="Stone"
+                        />
                       </div>
-                    </div>
-                  )}
-                </>
-              ) : (
-                <>
-                  {matchId ? (
-                    <></>
-                  ) : (
-                    <div className="center">
-                      {/* 3a/3b. User hosts / joins a match */}
-                      <h2>
-                        Click <b style={{ margin: "0 5px" }}>CREATE MATCH</b> to
-                        receive a code to share with your friend.
-                      </h2>
-                      <h2>
-                        <b>OR</b>
-                      </h2>
-                      <h2>
-                        Click <b style={{ margin: "0 5px" }}>JOIN MATCH</b> to
-                        enter a code to join.
-                      </h2>
-                    </div>
-                  )}
-                </>
-              )}
-              {matchId && !matchStarted ? (
-                <div className="center">
-                  <h2>Match Id: {matchId}</h2>
-                  <h2>Share this code with your friend to start the match!</h2>
+                    )}
+                    {playerMove === "Scroll" && (
+                      <div>
+                        <img
+                          src={require("./assets/images/scroll.png")}
+                          alt="Scroll"
+                        />
+                      </div>
+                    )}
+                    {playerMove === "Shears" && (
+                      <div>
+                        <img
+                          src={require("./assets/images/shears.png")}
+                          alt="Shears"
+                        />
+                      </div>
+                    )}
+                  </div>
+                  <div className="movePicture">
+                    <h2>Your opponent chose {result.opponentMove}.</h2>
+                    {result.opponentMove === "Stone" && (
+                      <div>
+                        <img
+                          src={require("./assets/images/stone.png")}
+                          alt="Stone"
+                        />
+                      </div>
+                    )}
+                    {result.opponentMove === "Scroll" && (
+                      <div>
+                        <img
+                          src={require("./assets/images/scroll.png")}
+                          alt="Scroll"
+                        />
+                      </div>
+                    )}
+                    {result.opponentMove === "Shears" && (
+                      <div>
+                        <img
+                          src={require("./assets/images/shears.png")}
+                          alt="Shears"
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
-              ) : (
-                <></>
-              )}
-            </>
-          )}
-        </>
-      ) : (
-        <>
-          {/* 1. User connects but is not signed in*/}
-          <h2 className="center">Sign in to get started!</h2>
-        </>
-      )}
-    </div>
+                <button onClick={() => reset()} className="reset">
+                  Reset
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </main>
+    </>
   );
 }
 
