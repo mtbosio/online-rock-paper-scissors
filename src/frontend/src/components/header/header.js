@@ -16,6 +16,7 @@ function Header({
             role="button"
             onClick={() => (window.location.href = "/")}
             target="_blank"
+            style={{ cursor: "pointer" }}
           >
             STONE, SCROLL, SHEARS
           </h1>
