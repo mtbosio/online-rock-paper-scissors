@@ -30,44 +30,55 @@ function App() {
   // 5. Opponent selects a move and the game ends.
   //    -- display result
   const [user, setUser] = useState(null);
-  const [profile, setProfile] = useState(null);
-  const [matchStarted, setMatchStarted] = useState(null);
   const [result, setResult] = useState(null);
   const [playerMove, setPlayerMove] = useState(null);
   const [matchId, setMatchID] = useState(null);
+  const [stats, setStats] = useState(null);
+  const [view, setView] = useState("idle");
   const login = useGoogleLogin({
-    onSuccess: (codeResponse) => setUser(codeResponse),
+    scope: "email profile",
+    onSuccess: async (tokenResponse) => {
+      const accessToken = tokenResponse.access_token;
+
+      try {
+        // Send the access token to the backend
+        const response = await axios.post(
+          `${process.env.REACT_APP_BACKEND_URL}/auth/google`,
+          {
+            accessToken: accessToken,
+          }
+        );
+
+        // Save the user profile from the backend response
+        setUser(response.data.user);
+      } catch (error) {
+        console.error("Error sending token to backend:", error);
+      }
+    },
     onError: (error) => console.log("Login Failed:", error),
   });
 
-  useEffect(() => {
-    if (user) {
-      axios
-        .get(
-          `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`,
-          {
-            headers: {
-              Authorization: `Bearer ${user.access_token}`,
-              Accept: "application/json",
-            },
-          }
-        )
-        .then((res) => {
-          setProfile(res.data);
-        })
-        .catch((err) => console.log(err));
+  const fetchStats = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}/user-stats/${user.sub}`
+      );
+      setStats(response.data);
+      setView("stats");
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error fetching user stats:", error);
     }
-  }, [user]);
-
+  };
   useEffect(() => {
     socket.on("startMatch", () => {
-      setMatchStarted(true);
+      setView("matchStarted");
       setResult(null);
     });
 
     socket.on("gameResult", (res) => {
       setResult(res);
-      setMatchStarted(false);
+      setView("result");
     });
 
     return () => {
@@ -79,19 +90,23 @@ function App() {
   // log out function to log the user out of google and set the profile array to null
   const logOut = () => {
     googleLogout();
-    setProfile(null);
+    setUser(null);
+    setMatchID(null);
+    setResult(null);
+    setStats(null);
   };
 
   const createMatch = () => {
     const id = Math.random().toString(36).substring(7);
     setMatchID(id);
-    console.log(matchId);
-    socket.emit("createMatch", id);
+    setView("matchCreated");
+    socket.emit("createMatch", id, user.sub);
   };
 
   const joinMatch = () => {
     const matchId = prompt("Enter Match ID:");
-    socket.emit("joinMatch", matchId);
+    console.log(user.sub);
+    socket.emit("joinMatch", matchId, user.sub);
   };
 
   const handleMove = (move) => {
@@ -102,19 +117,20 @@ function App() {
   const reset = () => {
     setMatchID(null);
     setPlayerMove(null);
-    setMatchStarted(null);
     setResult(null);
+    setView("idle");
   };
 
   return (
     <>
       <Header
-        user={profile}
+        user={user}
         login={login}
         logout={logOut}
         createMatch={createMatch}
         joinMatch={joinMatch}
-        matchStarted={matchStarted}
+        fetchStats={fetchStats}
+        view={view}
       />
       <main>
         {/* 1. User connects but is not signed in*/}
@@ -123,7 +139,7 @@ function App() {
         {user && (
           <>
             {/* Match has not been created yet */}
-            {!matchStarted && !matchId && !result && (
+            {view === "idle" && (
               <div className="center">
                 {/* 3a/3b. User hosts / joins a match */}
                 <h2>
@@ -140,14 +156,14 @@ function App() {
               </div>
             )}
             {/* Match has been created but not joined */}
-            {matchId && !matchStarted && !result && (
+            {view === "matchCreated" && (
               <div className="center">
                 <h2>Match Id: {matchId}</h2>
                 <h2>Share this code with your friend to start the match!</h2>
               </div>
             )}
             {/* Match has started */}
-            {matchStarted && (
+            {view === "matchStarted" && (
               <>
                 {/* Player has made a move */}
                 {playerMove && (
@@ -184,7 +200,7 @@ function App() {
               </>
             )}
             {/* Match is over and result is displayed */}
-            {result && (
+            {view === "result" && (
               <div className="resultContainer">
                 <h2>{result.message}</h2>
                 <div className="movePictureContainer">
@@ -246,6 +262,14 @@ function App() {
                 <button onClick={() => reset()} className="reset">
                   Reset
                 </button>
+              </div>
+            )}
+            {/* Player stats are displayed */}
+            {view === "stats" && (
+              <div>
+                <h2>Account: {stats.email}</h2>
+                <h2>Matches played: {stats.matchesPlayed}</h2>
+                <h2>Wins: {stats.wins}</h2>
               </div>
             )}
           </>
